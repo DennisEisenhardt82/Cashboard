@@ -1,0 +1,8 @@
+.claude/
+node_modules/
+.DS_Store
+Thumbs.db
+.netlify/
+
+# Original-Bilder (Quelle, nicht für die Website)
+/*.png

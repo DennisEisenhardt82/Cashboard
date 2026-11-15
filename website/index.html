@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#EEE8DA">
+<title>Cashboard – Spartöpfe</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cashboard">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Theme vor dem ersten Zeichnen setzen, damit nichts aufblitzt
+  try{const t=localStorage.getItem("theme");document.documentElement.dataset.theme=t||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
+<script src="config.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body class="auth">
+
+<div id="bg" aria-hidden="true"></div>
+<div id="dream" aria-hidden="true"><div class="px"><img src="img/traumfaenger.webp" alt="" width="600" height="1331" decoding="async" fetchpriority="low"></div></div>
+
+<div class="wrap">
+
+  <!-- LADEN -->
+  <section class="view on" id="v-loading"><div class="loading">Lade …</div></section>
+
+  <!-- LOGIN -->
+  <section class="view" id="v-login">
+    <div class="login">
+      <form class="login-card glass" id="loginForm" autocomplete="on">
+        <div class="leaf">🌿</div>
+        <h1>Cashboard</h1>
+        <div class="sub">Unsere Spartöpfe – bitte anmelden</div>
+        <label for="email">E-Mail</label>
+        <input class="field" id="email" type="email" autocomplete="username" required>
+        <label for="password">Passwort</label>
+        <input class="field" id="password" type="password" autocomplete="current-password" required>
+        <div class="err" id="loginErr" role="alert"></div>
+        <button class="save" id="loginBtn" type="submit">Anmelden</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ÜBERSICHT -->
+  <section class="view" id="v-home">
+    <header>
+      <div><h1>Spartöpfe</h1><div class="sub">Sparen. Träumen. Erreichen.</div></div>
+      <div class="head-actions">
+        <button class="icon-btn glass" id="themeBtn" title="Hell / Dunkel" aria-label="Hell oder dunkel">🌙</button>
+        <button class="icon-btn glass" id="logoutBtn" title="Abmelden" aria-label="Abmelden">⎋</button>
+      </div>
+    </header>
+    <div class="total">
+      <div><div class="lbl">Gesamtguthaben</div><div class="val" id="total"></div></div>
+      <div class="month">Ausgaben diesen Monat<b id="monthOut"></b></div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- DETAIL -->
+  <section class="view" id="v-detail">
+    <button class="back glass" data-go="home">← Übersicht</button>
+    <div class="hero glass" id="hero"></div>
+    <div class="list-title"><span>Buchungen</span><span id="txCount"></span></div>
+    <div id="txList"></div>
+    <div class="hint" id="swipeHint">Zum Löschen eine Buchung nach links wischen</div>
+  </section>
+
+  <!-- MONAT -->
+  <section class="view" id="v-month">
+    <header><div><h1>Monatsübersicht</h1><div class="sub">Was ging raus – pro Topf</div></div></header>
+    <div class="month-switch">
+      <button class="icon-btn glass" id="mPrev" aria-label="Voriger Monat">‹</button>
+      <b class="glass" id="mLabel"></b>
+      <button class="icon-btn glass" id="mNext" aria-label="Nächster Monat">›</button>
+    </div>
+    <div class="bars glass" id="bars"></div>
+  </section>
+
+</div>
+
+<nav class="nav">
+  <button class="tab glass on" data-go="home">◎ Töpfe</button>
+  <button class="fab glass" id="fab" aria-label="Neue Buchung">+</button>
+  <button class="tab glass" data-go="month">▤ Monat</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- Buchung -->
+<div class="sheet" id="bookSheet" role="dialog" aria-label="Neue Buchung">
+  <div class="grab"></div>
+  <div class="seg"><button class="on out" data-type="out">− Auszahlung</button><button class="in" data-type="in">+ Einzahlung</button></div>
+  <div class="pot-pick" id="potPick"></div>
+  <div class="amount" id="amount" aria-live="polite">0,00 €</div>
+  <div class="row2">
+    <input class="field" id="note" maxlength="120" placeholder="Notiz (optional)">
+    <input class="field" id="date" type="date" aria-label="Datum">
+  </div>
+  <div class="keys" id="keys"></div>
+  <button class="save" id="save">Speichern</button>
+</div>
+
+<!-- Sparziel -->
+<div class="sheet" id="goalSheet" role="dialog" aria-label="Sparziel">
+  <div class="grab"></div>
+  <h2 id="goalTitle">Sparziel</h2>
+  <input class="field goal-input" id="goalInput" inputmode="decimal" placeholder="z. B. 2.000">
+  <button class="save" id="goalSave">Ziel speichern</button>
+  <button class="ghost" id="goalRemove">Ziel entfernen</button>
+</div>
+
+<div class="toast" id="toast" role="status"><span id="toastMsg"></span><button id="undo">Rückgängig</button></div>
+
+</body>
+</html>
