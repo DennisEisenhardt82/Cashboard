@@ -13,7 +13,6 @@ const pad = n => String(n).padStart(2, "0");
 const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const todayStr = () => isoDate(new Date());
 
-const BANK_SHORT = { "Trade Republic": "TR", "Haspa": "H", "ING": "I", "Blaue Geldkassette": "€" };
 const BANK_ORDER = ["Trade Republic", "Haspa", "ING", "Blaue Geldkassette"];
 
 const CFG = window.CASHBOARD_CONFIG || {};
@@ -97,7 +96,7 @@ function renderHome() {
   $("#monthOut").textContent = "− " + eur(TX.filter(t => t.type === "out" && t.date.startsWith(ym)).reduce((s, t) => s + t.amount, 0));
   const banks = [...new Set([...BANK_ORDER.filter(b => POTS.some(p => p.bank === b)), ...POTS.map(p => p.bank)])];
   $("#chips").innerHTML = banks.map(b => `<button class="chip glass ${bankFilter === b ? "on" : ""}" data-bank="${esc(b)}" aria-pressed="${bankFilter === b}">
-    <i>${esc(BANK_SHORT[b] || b[0])}</i><div><small>${esc(b)}</small><span>${eur(POTS.filter(p => p.bank === b).reduce((s, p) => s + bal(p.id), 0))}</span></div></button>`).join("");
+    <small>${esc(b)}</small><span>${eur(POTS.filter(p => p.bank === b).reduce((s, p) => s + bal(p.id), 0))}</span></button>`).join("");
   $("#grid").innerHTML = POTS.filter(p => !bankFilter || p.bank === bankFilter).map(p => {
     const b = bal(p.id);
     return `<button class="pot glass" data-pot="${p.id}" style="${vars(p)}">
