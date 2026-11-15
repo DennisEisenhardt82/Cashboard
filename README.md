@@ -50,7 +50,7 @@ Auch die fertige Seite zeigt mit `?demo` am Ende der Adresse diesen Modus.
 
 ### 4. Zugangsdaten eintragen
 1. **Project Settings → API** (bzw. *Data API* / *API Keys*).
-2. **Project URL** und den **anon / public**-Schlüssel kopieren.
+2. **Project URL** und den **Publishable key** (`sb_publishable_…`, früher „anon / public“) kopieren.
 3. In `website/config.js` eintragen:
    ```js
    window.CASHBOARD_CONFIG = {

@@ -50,17 +50,17 @@ create policy "tx_delete"   on public.transactions for delete to authenticated u
 
 -- ---------- Die 11 Spartöpfe ----------
 insert into public.pots (id, name, bank, color, text_color, ring_color, sort) values
-  ( 1, 'Notgroschen',             'Trade Republic',     '#829B72', '#405B43', '#405B43',  1),
-  ( 2, 'Urlaub',                  'Trade Republic',     '#86A9B8', '#3E6475', '#5E8A5E',  2),
-  ( 3, 'Ausflüge',                'Haspa',              '#C7AA69', '#7A6230', '#829B72',  3),
-  ( 4, 'Kleidung',                'Haspa',              '#D49A72', '#8A5134', '#6E9E86',  4),
-  ( 5, 'Taschengeld',             'Blaue Geldkassette', '#A88DB0', '#5E4C6E', '#94AE6E',  5),
-  ( 6, 'Autoversicherung',        'Trade Republic',     '#95A39B', '#4E5B54', '#7FA38A',  6),
-  ( 7, 'TÜV + Service',           'Trade Republic',     '#7FA89A', '#3F6457', '#5E8A5E',  7),
-  ( 8, 'Weihnachten',             'ING',                '#C98F94', '#7E4148', '#A8B99A',  8),
-  ( 9, 'Krötenwanderung',         'ING',                '#A3B56E', '#56662C', '#829B72',  9),
-  (10, 'Rauchen',                 'ING',                '#B09A84', '#64503E', '#6E9E86', 10),
-  (11, 'Essen (Mastercard-Bons)', 'ING',                '#8E9CC7', '#48557F', '#405B43', 11)
+  ( 1, 'Notgroschen',             'Trade Republic',     '#7FA06A', '#4E6B3A', '#7FA06A',  1),
+  ( 2, 'Urlaub',                  'Trade Republic',     '#9BAEB0', '#4F6466', '#9BAEB0',  2),
+  ( 3, 'Ausflüge',                'Haspa',              '#C9A54E', '#7A5E1E', '#C9A54E',  3),
+  ( 4, 'Kleidung',                'Haspa',              '#E39A6B', '#A4552C', '#E39A6B',  4),
+  ( 5, 'Taschengeld',             'Blaue Geldkassette', '#A9B6C2', '#55626E', '#A9B6C2',  5),
+  ( 6, 'Autoversicherung',        'Trade Republic',     '#B3AA86', '#6A6244', '#B3AA86',  6),
+  ( 7, 'TÜV + Service',           'Trade Republic',     '#A6A35A', '#646130', '#A6A35A',  7),
+  ( 8, 'Weihnachten',             'ING',                '#D08C86', '#8E4A45', '#D08C86',  8),
+  ( 9, 'Krötenwanderung',         'ING',                '#C3C46E', '#6C6D2C', '#C3C46E',  9),
+  (10, 'Rauchen',                 'ING',                '#E2B48C', '#9A6438', '#E2B48C', 10),
+  (11, 'Essen (Mastercard-Bons)', 'ING',                '#C79AB5', '#7E4E6A', '#C79AB5', 11)
 on conflict (id) do nothing;
 
 -- ---------- Live-Abgleich zwischen Handy und Tablet ----------
