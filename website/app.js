@@ -121,13 +121,44 @@ function renderDetail() {
   const list = TX.filter(t => t.pot === p.id).sort((a, b) => b.date.localeCompare(a.date));
   $("#txCount").textContent = list.length === 1 ? "1 Eintrag" : `${list.length} Einträge`;
   $("#swipeHint").hidden = !list.length;
-  $("#txList").innerHTML = list.map(t => `<div class="tx-wrap"><div class="tx-del">Löschen</div>
-    <div class="tx glass" data-tx="${t.id}"><span class="d">${t.date.slice(8, 10)}.${t.date.slice(5, 7)}.${t.date.slice(2, 4)}</span>
-    <span class="n">${esc(t.note || (t.type === "in" ? "Einzahlung" : "Auszahlung"))}</span>
-    <span class="a ${t.type}">${t.type === "in" ? "+" : "−"} ${eur(t.amount)}</span></div></div>`).join("")
-    || `<div class="empty glass">Noch keine Buchungen.<br>Mit dem + unten geht's los.</div>`;
+  $("#txList").innerHTML = list.map(t => {
+    const label = t.note || (t.type === "in" ? "Einzahlung" : "Auszahlung");
+    const firstLine = label.split("\n")[0];
+    const open = openTx.has(t.id);
+    return `<div class="tx-wrap${open ? " open" : ""}" data-wrap="${t.id}">
+    <div class="tx-row"><div class="tx-del">Löschen</div>
+      <div class="tx glass" data-tx="${t.id}" role="button" tabindex="0" aria-expanded="${open}">
+        <span class="d">${t.date.slice(8, 10)}.${t.date.slice(5, 7)}.${t.date.slice(2, 4)}</span>
+        <span class="n">${esc(firstLine)}</span>
+        <span class="a ${t.type}">${t.type === "in" ? "+" : "−"} ${eur(t.amount)}</span>
+        <span class="chev" aria-hidden="true">▾</span>
+      </div></div>
+    <div class="tx-more glass">
+      ${t.note ? `<div class="tx-note">${esc(t.note)}</div>` : `<div class="tx-note muted">Keine Notiz</div>`}
+      <div class="tx-meta">${t.type === "in" ? "Einzahlung" : "Auszahlung"} am ${new Date(t.date + "T12:00").toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "long", year: "numeric" })}</div>
+      <div class="tx-actions"><button class="pill-btn" data-edit="${t.id}">✏️ Bearbeiten</button><button class="ghost-sm" data-del="${t.id}">Löschen</button></div>
+    </div></div>`;
+  }).join("") || `<div class="empty glass">Noch keine Buchungen.<br>Mit dem + unten geht's los.</div>`;
   bindSwipe();
 }
+
+// Buchung auf-/zuklappen, bearbeiten, löschen
+const openTx = new Set();
+$("#txList").addEventListener("click", e => {
+  const ed = e.target.closest("[data-edit]");
+  if (ed) return openBooking(TX.find(t => String(t.id) === ed.dataset.edit));
+  const del = e.target.closest("[data-del]");
+  if (del) { openTx.delete(del.dataset.del); return deleteTx(del.dataset.del); }
+  const row = e.target.closest(".tx");
+  if (!row || row.dataset.swiped) return;
+  const id = row.dataset.tx, wrap = row.closest(".tx-wrap");
+  if (openTx.has(id)) openTx.delete(id); else openTx.add(id);
+  wrap.classList.toggle("open", openTx.has(id));
+  row.setAttribute("aria-expanded", openTx.has(id));
+});
+$("#txList").addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.matches(".tx")) { e.preventDefault(); e.target.click(); }
+});
 
 function renderMonth() {
   const now = new Date(), m = new Date(now.getFullYear(), now.getMonth() - monthOffset, 1);
@@ -237,7 +268,7 @@ function pressKey(k) {
 }
 $("#keys").onclick = e => { const k = e.target.closest("[data-k]")?.dataset.k; if (k) pressKey(k); };
 document.addEventListener("keydown", e => {
-  if (!$("#bookSheet").classList.contains("show") || e.target.matches("input")) return;
+  if (!$("#bookSheet").classList.contains("show") || e.target.matches("input, textarea")) return;
   if (/^\d$/.test(e.key)) pressKey(e.key);
   else if (e.key === "," || e.key === ".") pressKey(",");
   else if (e.key === "Backspace") pressKey("⌫");
@@ -245,25 +276,37 @@ document.addEventListener("keydown", e => {
   else return;
   e.preventDefault();
 });
-$$(".seg button").forEach(b => b.onclick = () => {
-  sType = b.dataset.type;
-  $$(".seg button").forEach(x => x.classList.toggle("on", x === b));
-  showAmount();
-});
-function openBooking() {
-  sPot = view === "detail" ? current : null;
-  digits = ""; $("#note").value = ""; $("#date").value = todayStr(); $("#date").max = todayStr();
+$$(".seg button").forEach(b => b.onclick = () => { setType(b.dataset.type); showAmount(); });
+let editId = null;   // gesetzt, wenn eine bestehende Buchung bearbeitet wird
+function setType(t) {
+  sType = t;
+  $$(".seg button").forEach(x => x.classList.toggle("on", x.dataset.type === t));
+}
+function growNote() { const n = $("#note"); n.style.height = "auto"; n.style.height = Math.min(n.scrollHeight + 4, 220) + "px"; }
+$("#note").addEventListener("input", growNote);
+function openBooking(tx) {
+  editId = tx ? tx.id : null;
+  sPot = tx ? tx.pot : (view === "detail" ? current : null);
+  setType(tx ? tx.type : "out");
+  digits = tx ? tx.amount.toFixed(2).replace(".", ",").replace(/,00$/, "") : "";
+  $("#note").value = tx ? tx.note : "";
+  $("#date").value = tx ? tx.date : todayStr(); $("#date").max = todayStr();
+  $("#bookTitle").textContent = tx ? "Buchung bearbeiten" : "Neue Buchung";
+  $("#save").textContent = tx ? "Änderungen speichern" : "Speichern";
+  $("#bookDelete").hidden = !tx;
   $("#potPick").innerHTML = POTS.map(p => `<button type="button" data-pick="${p.id}" class="${p.id === sPot ? "on" : ""}"><i style="background:${p.c}"></i>${esc(p.name)}</button>`).join("");
   showAmount();
   openSheet("#bookSheet");
+  growNote();
   $("#potPick .on")?.scrollIntoView({ inline: "center", block: "nearest" });
 }
+$("#bookDelete").onclick = () => { const id = editId; closeSheets(); if (id != null) { openTx.delete(String(id)); deleteTx(id); } };
 $("#potPick").onclick = e => {
   const b = e.target.closest("[data-pick]"); if (!b) return;
   sPot = +b.dataset.pick;
   $$("[data-pick]").forEach(x => x.classList.toggle("on", x === b));
 };
-$("#fab").onclick = openBooking;
+$("#fab").onclick = () => openBooking();
 
 async function saveBooking() {
   if (saving) return;
@@ -273,13 +316,24 @@ async function saveBooking() {
   const date = $("#date").value || todayStr();
   saving = true; $("#save").disabled = true;
   const row = { pot_id: sPot, type: sType, amount: v, date, note: $("#note").value.trim() || null };
-  const { data, error } = DEMO ? { data: { id: uid(), ...row }, error: null }
-    : await sb.from("transactions").insert(row).select("id,pot_id,type,amount,date,note").single();
+  const cols = "id,pot_id,type,amount,date,note";
+  let res;
+  if (editId != null) {
+    res = DEMO ? { data: { id: editId, ...row }, error: null }
+      : await sb.from("transactions").update(row).eq("id", editId).select(cols).single();
+  } else {
+    res = DEMO ? { data: { id: uid(), ...row }, error: null }
+      : await sb.from("transactions").insert(row).select(cols).single();
+  }
+  const { data, error } = res;
   saving = false; $("#save").disabled = false;
   if (error) { console.error(error); return toast("Speichern hat nicht geklappt – bitte nochmal versuchen", null, true); }
-  if (!TX.some(t => t.id === data.id)) TX.push(mapTx(data));
+  const t = mapTx(data), i = TX.findIndex(x => x.id === t.id);
+  if (i >= 0) TX[i] = t; else TX.push(t);
+  const wasEdit = editId != null;
+  editId = null;
   closeSheets();
-  toast(`${eur(v)} bei ${potById(sPot).name} ${sType === "in" ? "eingezahlt" : "ausgezahlt"}`);
+  toast(wasEdit ? "Buchung geändert" : `${eur(v)} bei ${potById(sPot).name} ${sType === "in" ? "eingezahlt" : "ausgezahlt"}`);
   refresh();
 }
 $("#save").onclick = saveBooking;
@@ -351,6 +405,7 @@ function bindSwipe() {
     };
     el.onpointerup = el.onpointercancel = () => {
       el.classList.remove("drag");
+      if (horizontal) { el.dataset.swiped = "1"; setTimeout(() => delete el.dataset.swiped, 60); }  // kein Aufklappen nach Wischen
       if (horizontal && dx < -90) {
         el.style.transform = "translateX(-110%)";
         setTimeout(() => deleteTx(el.dataset.tx), 180);
@@ -412,6 +467,12 @@ async function init() {
     $("#logoutBtn").hidden = true;
     await startApp();
     toast("Demo-Modus: Beispieldaten, es wird nichts gespeichert", null, true);
+    return;
+  }
+  if (!sb) {   // Supabase-Bibliothek nicht geladen (z. B. ohne Internet)
+    go("login");
+    $("#loginErr").textContent = "Keine Verbindung – bitte Internet prüfen und neu laden.";
+    $("#loginBtn").disabled = true;
     return;
   }
   sb.auth.onAuthStateChange((event) => {

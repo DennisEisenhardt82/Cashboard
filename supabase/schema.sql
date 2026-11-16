@@ -41,12 +41,14 @@ drop policy if exists "pots_update" on public.pots;
 drop policy if exists "tx_select"   on public.transactions;
 drop policy if exists "tx_insert"   on public.transactions;
 drop policy if exists "tx_delete"   on public.transactions;
+drop policy if exists "tx_update"   on public.transactions;
 
 create policy "pots_select" on public.pots         for select to authenticated using (true);
 create policy "pots_update" on public.pots         for update to authenticated using (true) with check (true);
 create policy "tx_select"   on public.transactions for select to authenticated using (true);
 create policy "tx_insert"   on public.transactions for insert to authenticated with check (true);
 create policy "tx_delete"   on public.transactions for delete to authenticated using (true);
+create policy "tx_update"   on public.transactions for update to authenticated using (true) with check (true);
 
 -- ---------- Die Spartöpfe ----------
 insert into public.pots (id, name, bank, color, text_color, ring_color, sort) values

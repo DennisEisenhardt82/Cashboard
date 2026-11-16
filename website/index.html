@@ -100,17 +100,19 @@
 <div class="scrim" id="scrim"></div>
 
 <!-- Buchung -->
-<div class="sheet" id="bookSheet" role="dialog" aria-label="Neue Buchung">
+<div class="sheet" id="bookSheet" role="dialog" aria-labelledby="bookTitle">
   <div class="grab"></div>
+  <h2 class="sheet-title" id="bookTitle">Neue Buchung</h2>
   <div class="seg"><button class="on out" data-type="out">− Auszahlung</button><button class="in" data-type="in">+ Einzahlung</button></div>
   <div class="pot-pick" id="potPick"></div>
   <div class="amount" id="amount" aria-live="polite">0,00 €</div>
   <div class="row2">
-    <input class="field" id="note" maxlength="120" placeholder="Notiz (optional)">
+    <textarea class="field note-area" id="note" rows="1" maxlength="600" placeholder="Notiz (optional) – auch mehrere Posten, je Zeile einer"></textarea>
     <input class="field" id="date" type="date" aria-label="Datum">
   </div>
   <div class="keys" id="keys"></div>
   <button class="save" id="save">Speichern</button>
+  <button class="ghost" id="bookDelete" hidden>Buchung löschen</button>
 </div>
 
 <!-- Sparziel -->

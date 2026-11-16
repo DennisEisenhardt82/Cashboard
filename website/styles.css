@@ -97,13 +97,22 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .pot::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c);opacity:.75}
 /* Sanfter Glow in der Topffarbe: beim Darüberfahren, Antippen, per Tastatur
    und kurz nach dem Zurückkehren auf den zuletzt geöffneten Topf */
-.pot{--glow:0 0 0 1.5px color-mix(in srgb,var(--c) 55%,transparent),0 0 18px 2px color-mix(in srgb,var(--c) 42%,transparent),0 0 42px 6px color-mix(in srgb,var(--c) 18%,transparent)}
+.pot{--glow:0 0 0 2px color-mix(in srgb,var(--c) 75%,transparent),0 0 22px 4px color-mix(in srgb,var(--c) 60%,transparent),0 0 56px 10px color-mix(in srgb,var(--c) 28%,transparent)}
+:root[data-theme="dark"] .pot{--glow:0 0 0 2px color-mix(in srgb,var(--c) 80%,transparent),0 0 24px 5px color-mix(in srgb,var(--c) 55%,transparent),0 0 60px 12px color-mix(in srgb,var(--c) 24%,transparent)}
 .pot:hover,.pot:focus-visible{transform:translateY(-3px);box-shadow:var(--shadow-hover),var(--glow);background:var(--card-strong);outline:none}
 .pot:active{transform:translateY(0) scale(.99);box-shadow:var(--shadow),var(--glow)}
 .pot:hover,.pot:focus-visible,.pot:active,.pot.recent{z-index:2}
-.pot.recent{animation:potGlow 2.6s var(--ease) both}
-@keyframes potGlow{0%,35%{box-shadow:var(--shadow-hover),var(--glow)}100%{box-shadow:var(--shadow)}}
-:root[data-theme="dark"] .pot{--glow:0 0 0 1.5px color-mix(in srgb,var(--c) 60%,transparent),0 0 20px 3px color-mix(in srgb,var(--c) 38%,transparent),0 0 46px 8px color-mix(in srgb,var(--c) 16%,transparent)}
+.pot.recent{animation:potGlow 3s var(--ease) both}
+@keyframes potGlow{0%,45%{box-shadow:var(--shadow-hover),var(--glow)}100%{box-shadow:var(--shadow)}}
+
+/* Lichtband, das einmal um den Topf gleitet */
+@property --band{syntax:"<angle>";initial-value:0deg;inherits:false}
+.pot::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:2.5px;pointer-events:none;opacity:0;
+  background:conic-gradient(from var(--band),transparent 0deg 250deg,color-mix(in srgb,var(--c) 60%,transparent) 300deg,#fff 338deg,var(--c) 350deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.pot:hover::after,.pot:focus-visible::after,.pot.recent::after{animation:band 1.7s cubic-bezier(.45,.05,.4,1) forwards}
+@keyframes band{0%{--band:0deg;opacity:0}12%{opacity:1}85%{opacity:1}100%{--band:360deg;opacity:0}}
 .ring{flex:0 0 50px;height:50px;border-radius:50%;display:grid;place-items:center;position:relative;background:var(--cream);box-shadow:var(--inset)}
 .ring svg{position:absolute;inset:2px;width:46px;height:46px;transform:rotate(-90deg)}
 .ring .arc{animation:ringIn 1.4s var(--ease) both}
@@ -153,7 +162,8 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 6px 14px rgba(95,101,56,.28);transition:transform .2s var(--ease)}
 .pill-btn:hover{transform:translateY(-2px)}
 .list-title{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:0 6px 12px;display:flex;justify-content:space-between}
-.tx-wrap{position:relative;border-radius:18px;margin-bottom:10px;overflow:hidden}
+.tx-wrap{position:relative;margin-bottom:10px}
+.tx-row{position:relative;border-radius:18px;overflow:hidden}
 .tx-del{position:absolute;inset:0;background:var(--neg-soft);color:var(--neg);display:flex;align-items:center;justify-content:flex-end;padding-right:22px;font-weight:800;border-radius:18px}
 .tx{position:relative;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;touch-action:pan-y;user-select:none;transition:transform .25s var(--ease);background:var(--card-strong)}
 .tx.drag{transition:none}
@@ -163,6 +173,20 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .tx .a.out{background:var(--neg-soft);color:var(--neg)}
 .tx .a.in{background:#DDE5C4;color:#4B5A2C}
 :root[data-theme="dark"] .tx .a.in{background:#3F4730;color:#D6DDB8}
+.tx{cursor:pointer}
+.tx .chev{color:var(--muted);font-size:13px;transition:transform .3s var(--ease);margin-left:-4px}
+.tx-wrap.open .chev{transform:rotate(180deg)}
+.tx-wrap.open .tx{border-bottom-left-radius:6px;border-bottom-right-radius:6px}
+/* Aufklappbereich mit voller Notiz */
+.tx-more{display:none;margin-top:3px;border-radius:6px 6px 18px 18px;padding:14px 16px}
+.tx-wrap.open .tx-more{display:block;animation:drop .3s var(--ease)}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}}
+.tx-note{white-space:pre-wrap;word-break:break-word;font-weight:600;line-height:1.5}
+.tx-note.muted{color:var(--muted);font-weight:500;font-style:italic}
+.tx-meta{color:var(--muted);font-size:12.5px;font-weight:600;margin-top:8px}
+.tx-actions{display:flex;gap:10px;align-items:center;margin-top:4px}
+.tx-actions .pill-btn{height:38px;font-size:13.5px}
+.ghost-sm{margin-top:12px;height:38px;padding:0 14px;border-radius:999px;font-weight:800;font-size:13.5px;color:var(--neg);border:1px solid var(--line)}
 .hint{color:var(--muted);font-size:12px;text-align:center;margin-top:10px;font-weight:600}
 .empty{padding:28px;text-align:center;border-radius:20px;color:var(--muted);font-weight:600}
 
@@ -199,6 +223,9 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .field{width:100%;border:2px solid transparent;border-radius:999px;background:var(--bg);box-shadow:var(--inset);color:var(--text);padding:0 18px;height:48px;font:inherit;font-weight:600;outline:none;transition:border-color .25s,box-shadow .25s}
 .field:focus{border-color:var(--olive);box-shadow:0 0 0 4px rgba(133,138,85,.22)}
 .field::placeholder{color:var(--muted);font-weight:500}
+.note-area{height:48px;min-height:48px;max-height:220px;border-radius:22px;padding:12px 18px;resize:none;line-height:1.4;display:block}
+.row2{align-items:start}
+.sheet-title{font-size:15px!important;font-weight:800;color:var(--muted);text-align:center;margin:-6px 0 12px!important;letter-spacing:.2px}
 input[type=date].field{padding:0 14px;color-scheme:light}
 :root[data-theme="dark"] input[type=date].field{color-scheme:dark}
 .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
