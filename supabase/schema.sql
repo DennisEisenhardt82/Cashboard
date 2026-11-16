@@ -48,7 +48,7 @@ create policy "tx_select"   on public.transactions for select to authenticated u
 create policy "tx_insert"   on public.transactions for insert to authenticated with check (true);
 create policy "tx_delete"   on public.transactions for delete to authenticated using (true);
 
--- ---------- Die 11 Spartöpfe ----------
+-- ---------- Die Spartöpfe ----------
 insert into public.pots (id, name, bank, color, text_color, ring_color, sort) values
   ( 1, 'Notgroschen',             'Trade Republic',     '#7FA06A', '#4E6B3A', '#7FA06A',  1),
   ( 2, 'Urlaub',                  'Trade Republic',     '#9BAEB0', '#4F6466', '#9BAEB0',  2),
@@ -60,7 +60,8 @@ insert into public.pots (id, name, bank, color, text_color, ring_color, sort) va
   ( 8, 'Weihnachten',             'ING',                '#D08C86', '#8E4A45', '#D08C86',  8),
   ( 9, 'Krötenwanderung',         'ING',                '#C3C46E', '#6C6D2C', '#C3C46E',  9),
   (10, 'Rauchen',                 'ING',                '#E2B48C', '#9A6438', '#E2B48C', 10),
-  (11, 'Essen (Mastercard-Bons)', 'ING',                '#C79AB5', '#7E4E6A', '#C79AB5', 11)
+  (11, 'Essen (Mastercard-Bons)', 'ING',                '#C79AB5', '#7E4E6A', '#C79AB5', 11),
+  (12, 'Fabio KFO',               'Trade Republic',     '#8FB8C9', '#3F6A7C', '#8FB8C9', 12)
 on conflict (id) do nothing;
 
 -- ---------- Live-Abgleich zwischen Handy und Tablet ----------
