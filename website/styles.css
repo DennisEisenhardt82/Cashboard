@@ -95,8 +95,15 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 @media(min-width:1500px){.grid{grid-template-columns:repeat(3,1fr)}}
 .pot{position:relative;border-radius:var(--r);padding:14px 14px 14px 18px;display:flex;align-items:center;gap:14px;text-align:left;width:100%;min-height:82px;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s,background .3s}
 .pot::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c);opacity:.75}
-.pot:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);background:var(--card-strong)}
-.pot:active{transform:translateY(0) scale(.99)}
+/* Sanfter Glow in der Topffarbe: beim Darüberfahren, Antippen, per Tastatur
+   und kurz nach dem Zurückkehren auf den zuletzt geöffneten Topf */
+.pot{--glow:0 0 0 1.5px color-mix(in srgb,var(--c) 55%,transparent),0 0 18px 2px color-mix(in srgb,var(--c) 42%,transparent),0 0 42px 6px color-mix(in srgb,var(--c) 18%,transparent)}
+.pot:hover,.pot:focus-visible{transform:translateY(-3px);box-shadow:var(--shadow-hover),var(--glow);background:var(--card-strong);outline:none}
+.pot:active{transform:translateY(0) scale(.99);box-shadow:var(--shadow),var(--glow)}
+.pot:hover,.pot:focus-visible,.pot:active,.pot.recent{z-index:2}
+.pot.recent{animation:potGlow 2.6s var(--ease) both}
+@keyframes potGlow{0%,35%{box-shadow:var(--shadow-hover),var(--glow)}100%{box-shadow:var(--shadow)}}
+:root[data-theme="dark"] .pot{--glow:0 0 0 1.5px color-mix(in srgb,var(--c) 60%,transparent),0 0 20px 3px color-mix(in srgb,var(--c) 38%,transparent),0 0 46px 8px color-mix(in srgb,var(--c) 16%,transparent)}
 .ring{flex:0 0 50px;height:50px;border-radius:50%;display:grid;place-items:center;position:relative;background:var(--cream);box-shadow:var(--inset)}
 .ring svg{position:absolute;inset:2px;width:46px;height:46px;transform:rotate(-90deg)}
 .ring .arc{animation:ringIn 1.4s var(--ease) both}

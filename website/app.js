@@ -24,7 +24,7 @@ const uid = () => "demo-" + Date.now().toString(36) + Math.random().toString(36)
 
 let POTS = [];   // {id,name,bank,c,t,g,goal}
 let TX = [];     // {id,pot,type,amount,date,note}
-let bankFilter = null, current = null, monthOffset = 0, view = "loading";
+let bankFilter = null, current = null, monthOffset = 0, view = "loading", recentPot = null;
 const lastPct = new Map();   // für Ring-Animation nur bei Änderung
 let channel = null;
 
@@ -99,12 +99,13 @@ function renderHome() {
     <small>${esc(b)}</small><span>${eur(POTS.filter(p => p.bank === b).reduce((s, p) => s + bal(p.id), 0))}</span></button>`).join("");
   $("#grid").innerHTML = POTS.filter(p => !bankFilter || p.bank === bankFilter).map(p => {
     const b = bal(p.id);
-    return `<button class="pot glass" data-pot="${p.id}" style="${vars(p)}">
+    return `<button class="pot glass${p.id === recentPot ? " recent" : ""}" data-pot="${p.id}" style="${vars(p)}">
       <div class="ring">${ring(p, 50)}</div>
       <div class="info"><div class="name">${esc(p.name)}</div><div class="bank">${esc(p.bank)}</div>${p.goal ? `<div class="goal">Ziel ${eur(p.goal)}</div>` : ""}</div>
       <div class="bal ${b < 0 ? "neg" : ""}">${eur(b)}</div>
     </button>`;
   }).join("");
+  recentPot = null;   // Glow nur einmal direkt nach dem Zurückkehren
 }
 
 function renderDetail() {
@@ -145,12 +146,14 @@ function renderMonth() {
 const RENDER = { home: renderHome, detail: renderDetail, month: renderMonth, login() {}, loading() {} };
 
 function go(v) {
+  if (v === "home" && view === "detail") recentPot = current;
   view = v;
   $$(".view").forEach(e => e.classList.toggle("on", e.id === "v-" + v));
   $$(".nav [data-go]").forEach(b => b.classList.toggle("on", b.dataset.go === (v === "detail" ? "home" : v)));
   document.body.classList.toggle("auth", v === "login" || v === "loading");
   RENDER[v]();
-  scrollTo({ top: 0, behavior: "smooth" });
+  const back = $(".pot.recent");   // zurück aus einem Topf: dorthin scrollen, wo man war
+  if (back) back.scrollIntoView({ block: "center" }); else scrollTo({ top: 0, behavior: "smooth" });
 }
 const refresh = () => RENDER[view]();
 

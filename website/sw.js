@@ -1,6 +1,6 @@
 // Service Worker: macht die App installierbar und lädt die Oberfläche auch bei schlechtem Netz.
 // Daten (Supabase) werden NIE zwischengespeichert – die kommen immer frisch aus der Datenbank.
-const CACHE = "cashboard-v5";
+const CACHE = "cashboard-v6";
 const SHELL = ["./", "index.html", "styles.css", "app.js", "config.js", 
   "manifest.webmanifest", "img/traumfaenger.webp", "img/hintergrund.webp", "img/hintergrund-klein.webp", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
