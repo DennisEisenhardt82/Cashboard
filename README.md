@@ -91,6 +91,9 @@ Einmal anmelden – danach bleibt man angemeldet.
 
 ## Gut zu wissen
 
+- **Updates:** Nach jeder Änderung an der App in `website/sw.js` die Zahl bei `CACHE = "cashboard-vX"` um eins erhöhen.
+  Dann erkennen Handy und Tablet die neue Version selbst und laden einmal kurz neu („App aktualisiert ✨“).
+
 - **Kostenloser Supabase-Plan:** Projekte werden nach **7 Tagen ohne jede Nutzung pausiert**.
   Bei regelmäßiger Nutzung passiert das nicht. Falls doch: im Supabase-Dashboard auf
   **Restore project** klicken – die Daten bleiben erhalten.

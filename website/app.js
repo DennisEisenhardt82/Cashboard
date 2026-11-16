@@ -25,6 +25,7 @@ const uid = () => "demo-" + Date.now().toString(36) + Math.random().toString(36)
 let POTS = [];   // {id,name,bank,c,t,g,goal}
 let TX = [];     // {id,pot,type,amount,date,note}
 let bankFilter = null, current = null, monthOffset = 0, view = "loading", recentPot = null;
+let pendingReload = false;   // Update wartet, bis ein offenes Fenster geschlossen ist
 const lastPct = new Map();   // für Ring-Animation nur bei Änderung
 let channel = null;
 
@@ -238,7 +239,10 @@ function openSheet(id) {
   $("#scrim").classList.add("show"); $(id).classList.add("show");
   history.pushState({ ...(history.state || { view }), sheet: id }, "");
 }
-function hideSheets() { $("#scrim").classList.remove("show"); $$(".sheet").forEach(s => s.classList.remove("show")); }
+function hideSheets() {
+  $("#scrim").classList.remove("show"); $$(".sheet").forEach(s => s.classList.remove("show"));
+  if (pendingReload) setTimeout(reloadForUpdate, 1200);   // aufgeschobenes Update nachholen
+}
 function closeSheets() {
   if (history.state && history.state.sheet) history.back();   // popstate blendet das Fenster aus
   else hideSheets();
@@ -509,9 +513,29 @@ function demoData() {
     .map(([pot, type, amount, date, note], i) => ({ id: "demo-" + i, pot, type, amount, date, note: note || "" }));
 }
 
-if ("serviceWorker" in navigator && location.protocol === "https:") {
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+/* Automatische Updates: Sobald eine neue Version online ist, lädt die App einmal neu.
+   Ist gerade ein Fenster (Buchung/Sparziel) offen, wird damit gewartet, bis es zu ist. */
+function reloadForUpdate() {
+  if ($$(".sheet.show").length) { pendingReload = true; return; }
+  try { sessionStorage.setItem("updated", "1"); } catch (e) {}
+  location.reload();
 }
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  const hadController = !!navigator.serviceWorker.controller;   // beim allerersten Besuch nicht neu laden
+  let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController || reloading) return;
+    reloading = true; reloadForUpdate();
+  });
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then(reg => {
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") check(); });
+    setInterval(check, 30 * 60 * 1000);
+  }).catch(() => {});
+}
+try {
+  if (sessionStorage.getItem("updated")) { sessionStorage.removeItem("updated"); setTimeout(() => toast("App aktualisiert ✨"), 900); }
+} catch (e) {}
 
 init();
 })();
