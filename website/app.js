@@ -154,14 +154,36 @@ function go(v) {
 }
 const refresh = () => RENDER[view]();
 
+/* Navigation mit Browser-Verlauf: Der Zurück-Knopf (z. B. Android) schließt erst ein
+   offenes Fenster, dann Topf-/Monatsansicht – und erst auf der Startseite die App. */
+function nav(v) {
+  if (v === view) return;
+  if (v === "home") {
+    if (history.state && history.state.view && history.state.view !== "home") history.back();
+    else go("home");
+    return;
+  }
+  const st = { view: v, pot: current };
+  if (view === "home") history.pushState(st, ""); else history.replaceState(st, "");
+  go(v);
+}
+addEventListener("popstate", e => {
+  hideSheets();
+  if (view === "login" || view === "loading") return;
+  const st = e.state || { view: "home" };
+  if (st.sheet) { history.back(); return; }          // „Vorwärts“ in ein altes Fenster: überspringen
+  if (st.pot != null) current = st.pot;
+  if (st.view !== view || st.view === "detail") go(st.view || "home");
+});
+
 /* ---------------------------------------------------------------------
    Bedienung
 --------------------------------------------------------------------- */
 document.addEventListener("click", e => {
   const t = e.target.closest("[data-go],[data-pot],[data-bank]");
   if (!t) return;
-  if (t.dataset.go) go(t.dataset.go);
-  else if (t.dataset.pot) { current = +t.dataset.pot; go("detail"); }
+  if (t.dataset.go) nav(t.dataset.go);
+  else if (t.dataset.pot) { current = +t.dataset.pot; nav("detail"); }
   else { bankFilter = bankFilter === t.dataset.bank ? null : t.dataset.bank; renderHome(); }
 });
 $("#mPrev").onclick = () => { monthOffset++; renderMonth(); };
@@ -178,8 +200,15 @@ setTheme(document.documentElement.dataset.theme || "light");
 $("#themeBtn").onclick = () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
 
 // Sheets
-function openSheet(id) { $("#scrim").classList.add("show"); $(id).classList.add("show"); }
-function closeSheets() { $("#scrim").classList.remove("show"); $$(".sheet").forEach(s => s.classList.remove("show")); }
+function openSheet(id) {
+  $("#scrim").classList.add("show"); $(id).classList.add("show");
+  history.pushState({ ...(history.state || { view }), sheet: id }, "");
+}
+function hideSheets() { $("#scrim").classList.remove("show"); $$(".sheet").forEach(s => s.classList.remove("show")); }
+function closeSheets() {
+  if (history.state && history.state.sheet) history.back();   // popstate blendet das Fenster aus
+  else hideSheets();
+}
 $("#scrim").onclick = closeSheets;
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheets(); });
 
@@ -360,6 +389,7 @@ async function startApp() {
     return;
   }
   subscribeLive();
+  history.replaceState({ view: "home" }, "");
   go("home");
 }
 
@@ -384,7 +414,7 @@ async function init() {
   sb.auth.onAuthStateChange((event) => {
     if (event === "SIGNED_OUT") {
       if (channel) { sb.removeChannel(channel); channel = null; }
-      POTS = []; TX = []; closeSheets(); go("login");
+      POTS = []; TX = []; hideSheets(); go("login");
     }
   });
   const { data: { session } } = await sb.auth.getSession();
