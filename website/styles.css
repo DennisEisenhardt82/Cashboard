@@ -114,7 +114,7 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .pot:hover::after,.pot:focus-visible::after,.pot.recent::after{animation:band 1.7s cubic-bezier(.45,.05,.4,1) forwards}
 @keyframes band{0%{--band:0deg;opacity:0}12%{opacity:1}85%{opacity:1}100%{--band:360deg;opacity:0}}
 .ring{flex:0 0 50px;height:50px;border-radius:50%;display:grid;place-items:center;position:relative;background:var(--cream);box-shadow:var(--inset)}
-.ring svg{position:absolute;inset:2px;width:46px;height:46px;transform:rotate(-90deg)}
+.ring svg:not(.ico){position:absolute;inset:2px;width:46px;height:46px;transform:rotate(-90deg)}
 .ring .arc{animation:ringIn 1.4s var(--ease) both}
 .ring .arc.still{animation:none}
 @keyframes ringIn{from{stroke-dashoffset:var(--len)}}
@@ -158,7 +158,7 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .hero{border-radius:26px;padding:24px;display:flex;align-items:center;gap:22px;margin-bottom:22px;flex-wrap:wrap;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c) 30%,transparent),transparent 70%);pointer-events:none}
 .hero .ring{flex:0 0 120px;height:120px}
-.hero .ring svg{inset:7px;width:106px;height:106px}
+.hero .ring svg:not(.ico){inset:7px;width:106px;height:106px}
 .hero .ring{flex-direction:column;gap:2px;display:flex;align-items:center;justify-content:center}
 .hero .ring .pct{font-size:15px;position:relative}
 .hero .ring .ico{width:34px;height:34px}
