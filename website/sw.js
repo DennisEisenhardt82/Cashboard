@@ -1,7 +1,7 @@
 // Service Worker: macht die App installierbar und lädt die Oberfläche auch bei schlechtem Netz.
 // Daten (Supabase) werden NIE zwischengespeichert – die kommen immer frisch aus der Datenbank.
 // WICHTIG: Bei jeder Änderung an der App diese Nummer erhöhen – dann laden alle Geräte die neue Version automatisch.
-const CACHE = "cashboard-v10";
+const CACHE = "cashboard-v11";
 const SHELL = ["./", "index.html", "styles.css", "app.js", "icons.js", "config.js", 
   "manifest.webmanifest", "img/traumfaenger.webp", "img/hintergrund.webp", "img/hintergrund-klein.webp", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png"];
 
