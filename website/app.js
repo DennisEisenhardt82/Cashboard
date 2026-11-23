@@ -32,7 +32,21 @@ let channel = null;
 /* ---------------------------------------------------------------------
    Daten
 --------------------------------------------------------------------- */
-const mapPot = p => ({ id: p.id, name: p.name, bank: p.bank, c: p.color, t: p.text_color, g: p.ring_color, goal: p.goal == null ? null : Number(p.goal) });
+const mapPot = p => ({ id: p.id, name: p.name, bank: p.bank, c: p.color, t: p.text_color, g: p.ring_color, goal: p.goal == null ? null : Number(p.goal), icon: p.icon || null });
+
+/* Passendes Icon je Topf – erkannt am Namen, sonst Sparschwein */
+const ICON_RULES = [
+  [/notgroschen|notfall|rücklage/i, "life-buoy"], [/urlaub|reise/i, "tree-palm"], [/ausfl/i, "map"],
+  [/kleid|mode/i, "shirt"], [/taschengeld/i, "wallet"], [/versicherung/i, "car"], [/tüv|service|werkstatt/i, "wrench"],
+  [/weihnacht|geschenk|geburtstag/i, "gift"], [/kröte|krote/i, "coins"], [/rauch|zigarett/i, "cigarette"],
+  [/essen|lebensmittel|einkauf/i, "utensils"], [/kfo|zahn|zahnspange/i, "smile"], [/fun|spaß|spass/i, "party-popper"]];
+function iconSvg(p, cls = "ico") {
+  const lib = window.POT_ICONS || {};
+  const key = (p.icon && lib[p.icon]) ? p.icon : ((ICON_RULES.find(([re]) => re.test(p.name)) || [, "piggy-bank"])[1]);
+  const inner = lib[key] || lib["piggy-bank"] || "";
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+}
+const pctOf = p => p.goal ? Math.max(0, Math.min(1, bal(p.id) / p.goal)) : 0;
 const mapTx = t => ({ id: t.id, pot: t.pot_id, type: t.type, amount: Number(t.amount), date: t.date, note: t.note || "" });
 
 async function fetchAllTx() {
@@ -81,14 +95,14 @@ const vars = p => `--c:${p.c};--c-text:${p.t}`;
    Darstellung
 --------------------------------------------------------------------- */
 function ring(p, size) {
-  if (!p.goal) return `<div class="orb"></div>`;
+  if (!p.goal) return `<div class="orb">${iconSvg(p)}</div>`;
   const pct = Math.max(0, Math.min(1, bal(p.id) / p.goal)), r = size / 2 - 5, c = 2 * Math.PI * r;
   const key = `${p.id}-${size}`, changed = lastPct.get(key) !== pct;
   lastPct.set(key, pct);
   return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${p.c}" stroke-opacity=".22" stroke-width="5.5"/>
   <circle class="arc${changed ? "" : " still"}" cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${p.c}" stroke-width="5.5" stroke-linecap="round"
     style="--len:${c.toFixed(1)};stroke-dasharray:${c.toFixed(1)};stroke-dashoffset:${(c * (1 - pct)).toFixed(1)}"/></svg>
-  <span class="pct">${Math.round(pct * 100)}%</span>`;
+  ${iconSvg(p)}${size > 80 ? `<span class="pct">${Math.round(pct * 100)}%</span>` : ""}`;
 }
 
 function renderHome() {
@@ -102,7 +116,7 @@ function renderHome() {
     const b = bal(p.id);
     return `<button class="pot glass${p.id === recentPot ? " recent" : ""}" data-pot="${p.id}" style="${vars(p)}">
       <div class="ring">${ring(p, 50)}</div>
-      <div class="info"><div class="name">${esc(p.name)}</div><div class="bank">${esc(p.bank)}</div>${p.goal ? `<div class="goal">Ziel ${eur(p.goal)}</div>` : ""}</div>
+      <div class="info"><div class="name">${esc(p.name)}</div><div class="bank">${esc(p.bank)}</div>${p.goal ? `<div class="goal">Ziel ${eur(p.goal)} · ${Math.round(pctOf(p) * 100)} %</div>` : ""}</div>
       <div class="bal ${b < 0 ? "neg" : ""}">${eur(b)}</div>
     </button>`;
   }).join("");
@@ -251,7 +265,7 @@ $("#scrim").onclick = closeSheets;
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheets(); });
 
 // Buchen
-let sType = "out", sPot = null, digits = "", saving = false;
+let sType = "in", sPot = null, digits = "", saving = false;
 $("#keys").innerHTML = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ",", "0", "⌫"].map(k => `<button type="button" data-k="${k}" aria-label="${k === "⌫" ? "Löschen" : k}">${k}</button>`).join("");
 const amountValue = () => parseFloat((digits || "0").replace(",", ".")) || 0;
 function showAmount() {
@@ -291,14 +305,14 @@ $("#note").addEventListener("input", growNote);
 function openBooking(tx) {
   editId = tx ? tx.id : null;
   sPot = tx ? tx.pot : (view === "detail" ? current : null);
-  setType(tx ? tx.type : "out");
+  setType(tx ? tx.type : "in");
   digits = tx ? tx.amount.toFixed(2).replace(".", ",").replace(/,00$/, "") : "";
   $("#note").value = tx ? tx.note : "";
   $("#date").value = tx ? tx.date : todayStr(); $("#date").max = todayStr();
   $("#bookTitle").textContent = tx ? "Buchung bearbeiten" : "Neue Buchung";
   $("#save").textContent = tx ? "Änderungen speichern" : "Speichern";
   $("#bookDelete").hidden = !tx;
-  $("#potPick").innerHTML = POTS.map(p => `<button type="button" data-pick="${p.id}" class="${p.id === sPot ? "on" : ""}"><i style="background:${p.c}"></i>${esc(p.name)}</button>`).join("");
+  $("#potPick").innerHTML = POTS.map(p => `<button type="button" data-pick="${p.id}" class="${p.id === sPot ? "on" : ""}"><span class="pick-ico" style="${vars(p)}">${iconSvg(p)}</span>${esc(p.name)}</button>`).join("");
   showAmount();
   openSheet("#bookSheet");
   growNote();
@@ -499,10 +513,11 @@ function demoData() {
   const P = [
     [1, "Notgroschen", "Trade Republic", "#7FA06A", "#4E6B3A", 5000], [2, "Urlaub", "Trade Republic", "#9BAEB0", "#4F6466", 2000],
     [3, "Ausflüge", "Haspa", "#C9A54E", "#7A5E1E", 1500], [4, "Kleidung", "Haspa", "#E39A6B", "#A4552C", null],
-    [5, "Taschengeld", "Blaue Geldkassette", "#A9B6C2", "#55626E", null], [6, "Autoversicherung", "Trade Republic", "#B3AA86", "#6A6244", 900],
+    [5, "Taschengeld Sandra", "Blaue Geldkassette", "#C4A7C9", "#6E4B73", null], [15, "Taschengeld Dennis", "Blaue Geldkassette", "#A9B6C2", "#55626E", null], [6, "Autoversicherung", "Trade Republic", "#B3AA86", "#6A6244", 900],
     [7, "TÜV + Service", "Trade Republic", "#A6A35A", "#646130", 800], [8, "Weihnachten", "ING", "#D08C86", "#8E4A45", 600],
     [9, "Krötenwanderung", "ING", "#C3C46E", "#6C6D2C", null], [10, "Rauchen", "ING", "#E2B48C", "#9A6438", null],
-    [11, "Essen (Mastercard-Bons)", "ING", "#C79AB5", "#7E4E6A", null]];
+    [11, "Essen (Mastercard-Bons)", "ING", "#C79AB5", "#7E4E6A", null], [12, "Fabio KFO", "Trade Republic", "#8FB8C9", "#3F6A7C", 2500],
+    [14, "Fun Pocket Sandra", "ING", "#E0A3B8", "#8C4A62", null], [13, "Fun Pocket Dennis", "ING", "#8FA8D6", "#44598A", null]];
   POTS = P.map(([id, name, bank, c, t, goal]) => ({ id, name, bank, c, t, g: c, goal }));
   const n = new Date(), d = (dd, m = 0) => isoDate(new Date(n.getFullYear(), n.getMonth() - m, Math.min(dd, 28)));
   TX = [[1, "in", 3200, d(1, 2), "Startguthaben"], [1, "in", 150, d(1), "Monatsrate"], [2, "in", 1100, d(1, 2), "Startguthaben"], [2, "in", 120, d(1)],

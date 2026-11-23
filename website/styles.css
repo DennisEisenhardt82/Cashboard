@@ -119,6 +119,13 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .ring .arc.still{animation:none}
 @keyframes ringIn{from{stroke-dashoffset:var(--len)}}
 .ring .pct{font-size:11.5px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+/* Topf-Icons */
+.ring .ico{position:relative;width:22px;height:22px;color:var(--c-text)}
+:root[data-theme="dark"] .ring .ico{color:color-mix(in srgb,var(--c) 70%,#fff)}
+.orb{display:grid;place-items:center}
+.orb .ico{width:19px;height:19px;color:#fff;stroke-width:2.2;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.25))}
+.pot:hover .ico,.pot.recent .ico{animation:icoPop .6s var(--ease)}
+@keyframes icoPop{40%{transform:scale(1.18) rotate(-6deg)}}
 /* 3D-Kugel für Töpfe ohne Sparziel */
 .orb{width:38px;height:38px;border-radius:50%;
   background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.95) 0 8%,color-mix(in srgb,var(--c) 55%,#fff) 30%,var(--c) 68%,color-mix(in srgb,var(--c) 70%,#000) 100%);
@@ -151,7 +158,10 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c) 30%,transparent),transparent 70%);pointer-events:none}
 .hero .ring{flex:0 0 120px;height:120px}
 .hero .ring svg{inset:7px;width:106px;height:106px}
-.hero .ring .pct{font-size:22px}
+.hero .ring{flex-direction:column;gap:2px;display:flex;align-items:center;justify-content:center}
+.hero .ring .pct{font-size:15px;position:relative}
+.hero .ring .ico{width:34px;height:34px}
+.hero .orb .ico{width:38px;height:38px}
 .hero .orb{width:84px;height:84px}
 .hero .txt{position:relative;z-index:1;flex:1;min-width:200px}
 .hero .val{font-size:38px;font-weight:800;letter-spacing:-1px;color:var(--c-text);font-variant-numeric:tabular-nums}
@@ -216,6 +226,8 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .pot-pick{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 14px;margin:0 -2px;scrollbar-width:none}
 .pot-pick button{flex:0 0 auto;padding:0 15px;height:42px;border-radius:999px;background:var(--bg);border:1px solid var(--line);font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;transition:background .25s,border-color .25s,color .25s}
 .pot-pick button i{width:10px;height:10px;border-radius:50%}
+.pick-ico{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;margin-left:-6px}
+.pick-ico .ico{width:14px;height:14px;stroke-width:2.3}
 .pot-pick button.on{background:linear-gradient(180deg,#9A9D66,#7E8250);border-color:transparent;color:#FAF7EF}
 .amount{border-radius:22px;background:var(--bg);box-shadow:var(--inset);padding:16px 20px;text-align:right;font-size:38px;font-weight:800;letter-spacing:-.8px;margin-bottom:12px;font-variant-numeric:tabular-nums}
 .row2{display:grid;grid-template-columns:1fr 150px;gap:10px;margin-bottom:14px}
