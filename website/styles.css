@@ -229,6 +229,8 @@ h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.6px;color:var(--oliv
 .pot-pick button i{width:10px;height:10px;border-radius:50%}
 .pick-ico{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;margin-left:-6px}
 .pick-ico .ico{width:14px;height:14px;stroke-width:2.3}
+.pick-bank{font-size:11px;font-weight:700;color:var(--muted);margin-left:-2px}
+.pot-pick button.on .pick-bank{color:rgba(250,247,239,.85)}
 .pot-pick button.on{background:linear-gradient(180deg,#9A9D66,#7E8250);border-color:transparent;color:#FAF7EF}
 .amount{border-radius:22px;background:var(--bg);box-shadow:var(--inset);padding:16px 20px;text-align:right;font-size:38px;font-weight:800;letter-spacing:-.8px;margin-bottom:12px;font-variant-numeric:tabular-nums}
 .row2{display:grid;grid-template-columns:1fr 150px;gap:10px;margin-bottom:14px}

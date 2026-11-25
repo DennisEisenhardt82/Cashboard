@@ -39,7 +39,7 @@ const ICON_RULES = [
   [/notgroschen|notfall|rücklage/i, "life-buoy"], [/urlaub|reise/i, "tree-palm"], [/ausfl/i, "map"],
   [/kleid|mode/i, "shirt"], [/taschengeld/i, "wallet"], [/versicherung/i, "car"], [/tüv|service|werkstatt/i, "wrench"],
   [/weihnacht|geschenk|geburtstag/i, "gift"], [/kröte|krote/i, "coins"], [/rauch|zigarett/i, "cigarette"],
-  [/essen|lebensmittel|einkauf/i, "utensils"], [/kfo|zahn|zahnspange/i, "smile"], [/fun|spaß|spass/i, "party-popper"]];
+  [/essen|lebensmittel|einkauf/i, "utensils"], [/kfo|zahn|zahnspange/i, "smile"], [/fun|spaß|spass/i, "party-popper"], [/rente|alter|ruhestand/i, "armchair"]];
 function iconSvg(p, cls = "ico") {
   const lib = window.POT_ICONS || {};
   const key = (p.icon && lib[p.icon]) ? p.icon : ((ICON_RULES.find(([re]) => re.test(p.name)) || [, "piggy-bank"])[1]);
@@ -312,7 +312,7 @@ function openBooking(tx) {
   $("#bookTitle").textContent = tx ? "Buchung bearbeiten" : "Neue Buchung";
   $("#save").textContent = tx ? "Änderungen speichern" : "Speichern";
   $("#bookDelete").hidden = !tx;
-  $("#potPick").innerHTML = POTS.map(p => `<button type="button" data-pick="${p.id}" class="${p.id === sPot ? "on" : ""}"><span class="pick-ico" style="${vars(p)}">${iconSvg(p)}</span>${esc(p.name)}</button>`).join("");
+  $("#potPick").innerHTML = POTS.map(p => `<button type="button" data-pick="${p.id}" class="${p.id === sPot ? "on" : ""}"><span class="pick-ico" style="${vars(p)}">${iconSvg(p)}</span>${esc(p.name)}${POTS.some(o => o.id !== p.id && o.name === p.name) ? `<small class="pick-bank">${esc(p.bank)}</small>` : ""}</button>`).join("");
   showAmount();
   openSheet("#bookSheet");
   growNote();

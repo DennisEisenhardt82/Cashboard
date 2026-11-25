@@ -55,19 +55,21 @@ create policy "tx_update"   on public.transactions for update to authenticated u
 insert into public.pots (id, name, bank, color, text_color, ring_color, sort) values
   ( 1, 'Notgroschen',             'Trade Republic',     '#7FA06A', '#4E6B3A', '#7FA06A',  1),
   ( 2, 'Urlaub',                  'Trade Republic',     '#9BAEB0', '#4F6466', '#9BAEB0',  2),
-  ( 3, 'Ausflüge',                'Haspa',              '#C9A54E', '#7A5E1E', '#C9A54E',  3),
-  ( 4, 'Kleidung',                'Haspa',              '#E39A6B', '#A4552C', '#E39A6B',  4),
-  ( 5, 'Taschengeld Sandra',      'Blaue Geldkassette', '#C4A7C9', '#6E4B73', '#C4A7C9',  5),
-  (15, 'Taschengeld Dennis',      'Blaue Geldkassette', '#A9B6C2', '#55626E', '#A9B6C2',  6),
-  ( 6, 'Autoversicherung',        'Trade Republic',     '#B3AA86', '#6A6244', '#B3AA86',  7),
-  ( 7, 'TÜV + Service',           'Trade Republic',     '#A6A35A', '#646130', '#A6A35A',  8),
-  (12, 'Fabio KFO',               'Trade Republic',     '#8FB8C9', '#3F6A7C', '#8FB8C9',  9),
-  ( 8, 'Weihnachten',             'ING',                '#D08C86', '#8E4A45', '#D08C86', 10),
-  ( 9, 'Krötenwanderung',         'ING',                '#C3C46E', '#6C6D2C', '#C3C46E', 11),
-  (10, 'Rauchen',                 'ING',                '#E2B48C', '#9A6438', '#E2B48C', 12),
-  (11, 'Essen (Mastercard-Bons)', 'ING',                '#C79AB5', '#7E4E6A', '#C79AB5', 13),
-  (14, 'Fun Pocket Sandra',       'ING',                '#E0A3B8', '#8C4A62', '#E0A3B8', 14),
-  (13, 'Fun Pocket Dennis',       'ING',                '#8FA8D6', '#44598A', '#8FA8D6', 15)
+  ( 6, 'Autoversicherung',        'Trade Republic',     '#B3AA86', '#6A6244', '#B3AA86',  3),
+  ( 7, 'TÜV + Service',           'Trade Republic',     '#A6A35A', '#646130', '#A6A35A',  4),
+  (12, 'Fabio KFO',               'Trade Republic',     '#8FB8C9', '#3F6A7C', '#8FB8C9',  5),
+  (16, 'Rente',                   'Trade Republic',     '#C2A878', '#6E5730', '#C2A878',  6),
+  ( 3, 'Ausflüge',                'ING',                '#C9A54E', '#7A5E1E', '#C9A54E',  7),
+  ( 4, 'Kleidung',                'ING',                '#E39A6B', '#A4552C', '#E39A6B',  8),
+  ( 8, 'Weihnachten',             'ING',                '#D08C86', '#8E4A45', '#D08C86',  9),
+  ( 9, 'Krötenwanderung',         'ING',                '#C3C46E', '#6C6D2C', '#C3C46E', 10),
+  (10, 'Rauchen',                 'ING',                '#E2B48C', '#9A6438', '#E2B48C', 11),
+  (11, 'Essen (Mastercard-Bons)', 'ING',                '#C79AB5', '#7E4E6A', '#C79AB5', 12),
+  (14, 'Fun Pocket Sandra',       'ING',                '#E0A3B8', '#8C4A62', '#E0A3B8', 13),
+  (13, 'Fun Pocket Dennis',       'ING',                '#8FA8D6', '#44598A', '#8FA8D6', 14),
+  (17, 'Rente',                   'ING',                '#93B58C', '#4C6A45', '#93B58C', 15),
+  ( 5, 'Taschengeld Sandra',      'Blaue Geldkassette', '#C4A7C9', '#6E4B73', '#C4A7C9', 16),
+  (15, 'Taschengeld Dennis',      'Blaue Geldkassette', '#A9B6C2', '#55626E', '#A9B6C2', 17)
 on conflict (id) do nothing;
 
 -- ---------- Live-Abgleich zwischen Handy und Tablet ----------
